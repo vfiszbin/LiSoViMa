@@ -83,7 +83,20 @@ Usage:
 ```
 
 ### `train_mcqa.sh`
-TODO
+This script fine-tunes the MCQA model on STEM-related multiple-choice QA data using the Low-Rank Adaptation technique. It leverages a pre-trained base model and adapts it for multiple-choice question answering tasks by incorporating LoRA to improve performance with fewer parameters.
+
+The script performs the following steps:
+
+- Installs the necessary dependencies from train_mcqa/requirements.txt.
+- Prepares and preprocesses the MCQA dataset, or create and preprocess it if non-existant.
+- Loads the base model (Qwen/Qwen3-0.6B-Base or given one) and tokenizer.
+- Fine-tunes the base model using LoRA adapters, with specific hyperparameters (learning rate, batch size, gradient accumulation steps).
+- Saves the final trained model to the specified output directory.
+
+Usage: 
+```bash
+./train_mcqa.sh
+```
 
 ### `train_quantized.sh`
 TODO
