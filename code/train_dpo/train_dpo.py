@@ -12,9 +12,7 @@ import multiprocessing
 import wandb
 
 def prepare_and_push_dataset(
-    hf_token,
     hf_user,
-    dataset_name,
     source_dataset,
     seed=42,
 ):
@@ -38,11 +36,8 @@ def main():
     parser = argparse.ArgumentParser(description="Train DPO model script")
 
     # Dataset preparation args
-    parser.add_argument("--hf_token", type=str, required=True, help="Hugging Face API token")
     parser.add_argument("--hf_user", type=str, required=True, help="Hugging Face username or org")
-    parser.add_argument("--dataset_name", type=str, default=None,
-                        help="Name of the dataset to upload (e.g. user/dataset)")
-    parser.add_argument("--source_dataset", type=str, default="thdsofia/DPO_STEM_training",
+dat    parser.add_argument("--source_dataset", type=str, default="thdsofia/DPO_STEM_training",
                         help="Source dataset to load and process")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility")
 
@@ -73,9 +68,7 @@ def main():
 
     # Dataset preparation and upload
     ds = prepare_and_push_dataset(
-        hf_token=args.hf_token,
         hf_user=args.hf_user,
-        dataset_name=args.dataset_name,
         source_dataset=args.source_dataset,
         seed=args.seed,
     )
