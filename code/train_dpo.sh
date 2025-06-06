@@ -1,7 +1,8 @@
 #!/bin/bash
 python train_dpo/train_dpo.py \
   --hf_user "thdsofia" \
-  --source_dataset "thdsofia/DPO_STEM_training" \
+  --dataset_name "thdsofia/DPO_STEM_training"
+  --source_dataset "argilla/ultrafeedback-binarized-preferences" \
   --seed 42 \
   --base_model "thdsofia/general_sft" \
   --output_dir "./dpo-output" \

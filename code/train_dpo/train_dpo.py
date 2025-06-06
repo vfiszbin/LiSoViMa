@@ -10,15 +10,85 @@ from huggingface_hub.utils import RepositoryNotFoundError
 from trl import DPOTrainer, DPOConfig
 import multiprocessing
 import wandb
+import pandas as pd
+from mistralai import Mistral
 
 def prepare_and_push_dataset(
     hf_user,
     source_dataset,
+    dataset_name,
     seed=42,
 ):
-    raw = load_dataset(source_dataset)["train"]
+    
+    API_KEY = ""
+    hf_token = ""
 
-    dataset = raw.select_columns(["prompt", "chosen", "rejected"])
+    api = HfApi(token=token)
+    dataset_exists = False 
+    
+    try:
+        api.dataset_info(repo_id)
+        dataset_exists=True
+    except RepositoryNotFoundError:
+        dataset_exists=False
+
+
+    if not(dataset_exists):
+        client = Mistral(api_key=API_KEY)
+        model = "mistral-large-latest"
+        
+        def preprocess_for_argilla(example):
+            return {
+                "prompt": example["instruction"],
+                "chosen": example["chosen_response"],
+                "rejected": example["rejected_response"]
+            }
+    
+        raw = load_dataset(source_dataset, split="train")
+        raw = raw.map(preprocess_for_argilla, remove_columns=raw_dataset.column_names)
+        
+        df = raw.to_pandas()
+        
+        for idx, row in df.iterrows():
+            prompt = f"""A STEM-related question is a question in one of these fields : scientific inquiry, technological innovation, engineering design, and mathematical analysis.
+                    Given the question below, say 'yes' if it is a STEM related question and 'no' if it is not. 
+                    
+                    Question:
+                    {row.prompt}
+                    
+                    Respond with only yes or no.
+                    """
+        
+            if resulting_df.loc[idx, "is_stem"] == "":
+                try:
+                    chat_response = client.chat.complete(
+                        model=model,
+                        messages=[{"role": "user", "content": prompt.strip()}]
+                    )
+                    
+                    answer = chat_response.choices[0].message.content.strip()
+                    if answer[:3]=="yes" or answer[:3]=="Yes":
+                        i+=1
+                    is_stem_list.append(answer[:3])
+                    resulting_df.loc[idx, "is_stem"] = answer[:3]
+                    
+                    time.sleep(2)
+                except Exception as e:
+                    print(f"Error at row {idx}.")
+                    time.sleep(2)
+        
+            if idx % 50 == 0 and idx != 0:
+                resulting_df.to_json("filtered_data.json", orient="records", indent=2, force_ascii=False)
+                print(f"Checkpoint saved at row {idx}, with {i} stem questions.")
+        
+            idx_temp += 1 
+        
+        stem_df = resulting_df.loc[(resulting_df.is_stem=="yes") | (resulting_df.is_stem=="Yes")]
+        dataset = stem_df.drop(columns=["is_stem"])
+        dataset = Dataset.from_pandas(dataset)
+    else:
+        raw = load_dataset(dataset_name)["train"]
+        dataset = raw.select_columns(["prompt", "chosen", "rejected"])
 
     print(f"Dividing dataset into train/validation sets...")
     split = dataset.train_test_split(test_size=0.1)
@@ -37,8 +107,9 @@ def main():
 
     # Dataset preparation args
     parser.add_argument("--hf_user", type=str, required=True, help="Hugging Face username or org")
-dat    parser.add_argument("--source_dataset", type=str, default="thdsofia/DPO_STEM_training",
-                        help="Source dataset to load and process")
+    parser.add_argument("--source_dataset", type=str, default="argilla/ultrafeedback-binarized-preferences", help="Source dataset to load and process")
+    parser.add_argument("--dataset_name", type=str, default="thdsofia/DPO_STEM_training",
+                        help="Dataset for training")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility")
 
     # Training args
@@ -70,6 +141,7 @@ dat    parser.add_argument("--source_dataset", type=str, default="thdsofia/DPO_S
     ds = prepare_and_push_dataset(
         hf_user=args.hf_user,
         source_dataset=args.source_dataset,
+        dataset_name=args.dataset_name,
         seed=args.seed,
     )
 
