@@ -18,9 +18,6 @@ def prepare_and_push_dataset(
     source_dataset,
     seed=42,
 ):
-    login(token=hf_token)
-    api = HfApi(token=hf_token)
-
     raw = load_dataset(source_dataset)["train"]
 
     dataset = raw.select_columns(["prompt", "chosen", "rejected"])
@@ -32,9 +29,6 @@ def prepare_and_push_dataset(
         "train": split["train"],
         "val": split["val"]
     })
-    
-    print(f"Pushing dataset to {dataset_name}...")
-    dataset.push_to_hub(dataset_name)
     
     print("✅ Dataset upload completed.")
     return dataset
