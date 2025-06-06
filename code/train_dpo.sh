@@ -6,7 +6,7 @@ python train_dpo/train_dpo.py \
   --source_dataset "thdsofia/DPO_STEM_training" \
   --seed 42 \
   --base_model "thdsofia/general_sft" \
-  --output_dir "./dposft-output" \
+  --output_dir "./dpo-output" \
   --batch_size 2 \
   --gradient_accumulation_steps 16 \
   --learning_rate 1e-5 \
