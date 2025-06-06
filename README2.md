@@ -122,4 +122,18 @@ Usage:
 ```
 
 ### `train_dpo.sh`
-TODO
+This script trains a causal language model using the Direct Preference Optimization (dpo) method. It performs the following steps: 
+
+- Load `/source_dataset/` from Hugging Face Hub.
+- Select only `\["prompt", "chosen", "rejected"]`\ columns.
+- Split the data into 90% train and 10% validation using seed.
+- Load a pretrained base model and tokenizer from Hugging Face.
+- Configure DPO training using DPOConfig.
+- Initialize the DPO trainer.
+- Check if there is any checkpoint saved in the output directory and starts from the latest one. Otherwise, trains from scratch.
+- Save final model and tokenizer to `\output_dir`\ named `\dpo_output`\.
+
+Usage: 
+```bash
+./train_dpo.sh
+```
