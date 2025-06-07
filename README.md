@@ -1,89 +1,166 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/xR4NrJfU)
-# CS-552 - Final Submission
+# MNLP M3 — Final Project Submission
 
-Welcome to the final submission for the MNLP project! For this last submission, as you can read in the [project description](https://docs.google.com/document/d/1BUeMoBb2zwg1YvO_OnLcqFiXQd8hxiF8ub-cM2MbX_M/edit?usp=sharing), you have 4 main goals:
+This repository contains the complete pipeline, codebase, and configuration files to reproduce and evaluate four fine-tuned language models developed during the Modern Natural Language Processing course project (M3):  
+- **MCQA model**
+- **Quantized model**
+- **Retrieval-Augmented Generation (RAG) model**
+- **Direct Preference Optimization (DPO) model**
 
-1. Finish training the four models detailed in the project description: DPO, MCQA, Quantized-MCQA, RAG-MCQA, optimizing their performance as well as you can, and submit them. (individual work, one model per member)
-2. Submit the code you used to train your models, including the training script for each model.
-3. Submit the training data used for each model.
-4. Write a final report (group work)
+We also include a pipeline for **Supervised Fine-Tuning (SFT)** on STEM data, which serves as a base for some of the above models.
 
-Note: Note that for this final submission, the models will be evaluated based on their performance.
+---
 
-## Repo Structure
+## Repository Structure
 
-The repo has 6 folders, 4 of which serve for you to submit all four deliverables:
+```
+.
+├── code/
+│   ├── train_mcqa/               # Code to fine-tune the MCQA model
+│   ├── train_quantized/          # Code for quantization-based fine-tuning
+│   ├── train_rag/                # Code for training the RAG model
+│   ├── train_dpo/                # Code to train the DPO model
+│   ├── train_sft/                # Extra: pipeline for supervised fine-tuning on STEM
+│   ├── train_mcqa.sh             # Training script for MCQA model
+│   ├── train_quantized.sh        # Training script for Quantized model
+│   ├── train_rag.sh              # Training script for RAG model
+│   ├── train_dpo.sh              # Training script for DPO model
+│   └── train_sft.sh           # Optional script to run the SFT pipeline
+│
+├── model_configs/
+│   ├── mcqa_model.yaml
+│   ├── quantized_model.yaml
+│   ├── rag_model.yaml
+│   └── dpo_model.yaml
+│
+├── data/
+│   └── data_repo.json            # Pointers to training datasets on Hugging Face Hub
+│
+├── pdf/
+│   └── LiSoViMa.pdf          # Final project report
+│
+├── _templates/
+│   └── mnlp_report_template.tex  # Report template used for the final project report
+│
+└── _test/
+    └── run_tests.py              # Scripts to validate submission format
+```
 
-1. `_templates` contains the LaTeX template for your final report. You MUST use this template.
-2. `_test` contains scripts that run automated tests to validate that your submission is correctly formatted.
-3. `model_configs` should be populated by you with the 4 model config YAML files, including `dpo_model.yaml`, `mcqa_model.yaml`, `quantized_model.yaml`, and `rag_model.yaml`. Make sure you fill in the important information in each config file, and the information is exactly what is used for evaluating your models. You need to change `<HF_USERNAME_team_member_X>` to your Huggingface Hub username. Make sure that you have submitted your models to the correct Huggingface Hub repositories, adhering to the following name convention:
+---
 
-- `<HF_USERNAME_team_member_DPO>/MNLP_M3_dpo_model`
-- `<HF_USERNAME_team_member_MCQA>/MNLP_M3_mcqa_model`
-- `<HF_USERNAME_team_member_QUANTIZED>/MNLP_M3_quantized_model`
-- `<HF_USERNAME_team_member_RAG>/MNLP_M3_rag_model`
+## 🔧 Training Scripts
 
-    For the team member responsible for the RAG model, make sure you have submitted the two additional deliverables specific to RAG:
+Each model has its own training script that reproduces the fine-tuning process:
 
-- `<HF_USERNAME_team_member_RAG>/<RAG_DOCUMENT_REPO_NAME>`, replace `<RAG_DOCUMENT_REPO_NAME>` with the actual Huggingface Hub repo name of your submitted RAG documents.
-- `<HF_USERNAME_team_member_RAG>/MNLP_M3_document_encoder`
+```bash
+bash train_mcqa.sh
+bash train_quantized.sh
+bash train_rag.sh
+bash train_dpo.sh
+bash train_sft.sh
+```
 
-4. `pdf` should be filled by you with your final report PDF (titled `<YOUR-GROUP-NAME>.pdf`). This directory should then have only one PDF.
-5. `data` contains `data_repo.json`. In this file, you need to change `<HF_USERNAME_team_member_X>` to your Huggingface Hub username. Make sure that you have submitted the training data for your 4 models to the correct Huggingface Hub repositories, adhering to the following name convention:
+These scripts will:
+- Construct the appropriate datasets
+- Train the model using your specified configuration
+- Save the final and best checkpoints locally
 
-- `<HF_USERNAME_team_member_DPO>/MNLP_M3_dpo_dataset`
-- `<HF_USERNAME_team_member_MCQA>/MNLP_M3_mcqa_dataset`
-- `<HF_USERNAME_team_member_QUANTIZED>/MNLP_M3_quantized_dataset`
-- `<HF_USERNAME_team_member_RAG>/MNLP_M3_rag_dataset`
+You should be able to reproduce the submission by running each script independently.
 
-6. The `code` must contain the following:
+### `train_sft.sh`
 
-- Four Bash Training Scripts:
-You must provide four executable Bash scripts (.sh files) in the root of the `code` directory. These scripts are essential for reproducing your results and obtaining models equivalent to those you submit.
+This optional script trains a **base language model** on STEM-related multiple-choice QA data using a **Supervised Fine-Tuning (SFT)** approach. It is useful for pretraining a foundational model before applying more advanced techniques like MCQA, RAG or quantization.
 
-    - `train_dpo.sh`
-    - `train_mcqa.sh`
-    - `train_quantized.sh`
-    - `train_rag.sh` 
+The script performs the following:
+ 
+- Select a subset of num_rows rows from source_dataset
+- Pushes the subset dataset on Hugging Face Hub
+- Fine-tunes base_model using the indicated arguments on the subset dataset
+- Pushes the final checkpoint to the Hugging Face Hub
 
-- Four Corresponding Subfolders for Training Code:
-For each of the four models, you should create a dedicated subfolder within code/ to house its specific training code. These folders should have the following structure:
+Usage: 
+```bash
+./train_sft.sh
+```
 
-    - `train_dpo/`
-    - `train_mcqa/`
-    - `train_quantized/`
-    - `train_rag/ `
+### `train_mcqa.sh`
+This script fine-tunes the MCQA model on STEM-related multiple-choice QA data using the Low-Rank Adaptation technique. It leverages a pre-trained base model and adapts it for multiple-choice question answering tasks by incorporating LoRA to improve performance with fewer parameters.
 
-    By running these scripts we should be able to reproduce your training process and obtain models that are functionally equivalent to the ones you have developed and submitted.
+The script performs the following steps:
 
-## Running the tests manually
+- Installs the necessary dependencies from train_mcqa/requirements.txt.
+- Prepares and preprocesses the MCQA dataset, or create and preprocess it if non-existant.
+- Loads the base model (Qwen/Qwen3-0.6B-Base or given one) and tokenizer.
+- Fine-tunes the base model using LoRA adapters, with specific hyperparameters (learning rate, batch size, gradient accumulation steps).
+- Saves the final trained model to the specified output directory.
 
-The autograding tests run automatically with every commit to the repo. If you want to trigger them manually, follow the instructions from the previous milestone.
+Usage: 
+```bash
+./train_mcqa.sh
+```
 
-## Evaluation Suite
+### `train_quantized.sh`
+This script trains a quantized version of the model using 4-bit QLoRA fine-tuning on STEM-related multiple-choice QA data. It builds the dataset automatically if not found, and applies 4-bit quantization with LoRA adapters to optimize for memory efficiency without sacrificing accuracy.
 
-For the final submission, same as M2, we provide you with an [evaluation suite](https://github.com/eric11eca/lighteval-epfl-mnlp) to benchmark each of the four models. As we covered in the compute tutorial session, details about how we evaluate your models are listed in these slides: [Evaluation Implementation Slides](https://docs.google.com/presentation/d/1SoVY4u6fDgXQ-F6TdarwaINhQ30NnE9Zb2XFavz3PGU/edit?usp=sharing).
+The script performs the following steps:
+-	Installs dependencies from train_quantized/quantized_requirements.txt
+-	Prepares and preprocesses the MCQA dataset, or create and preprocess it if non-existant
+-	Loads the Qwen3-0.6B-Base model in 4-bit (nf4, double quant, bfloat16)
+-	Injects LoRA adapters into all linear layers of the quantized model
+-	Fine-tunes the model on the MCQA dataset
+-	Merges the LoRA adapters back into the base model
+-	Saves the final trained model to the specified output directory
 
-We provide you with a demo MCQA evaluation dataset and a demo DPO evaluation dataset on the Huggingface Hub:
+Usage: 
+```bash
+bash train_quantized.sh
+```
 
-- [MCQA demo dataset](https://huggingface.co/datasets/zechen-nlp/MNLP_STEM_mcqa_demo)
-- [DPO demo dataset](https://huggingface.co/datasets/zechen-nlp/MNLP_dpo_demo)
+### `train_rag.sh`
 
-Also, for the RAG part, here is a demo Huggingface repo for the RAG documents and a collection of pretrained huggingface embedding models you can start with:
+This script fine-tunes a **RAG-ready language model** on STEM-related multiple-choice QA data using **LoRA** and a **retrieval-augmented generation (RAG)** setup. It assumes a prior base model fine-tuned via SFT, and adds retrieval capabilities by aligning the model with an external corpus built from PDF textbooks.
 
-- [RAG documents demo](https://huggingface.co/datasets/m-ric/huggingface_doc)
-- [RAG embedding model collection on Huggingface Hub](https://huggingface.co/models?library=sentence-transformers)
+The script performs the following steps:
 
-## Submission Via Huggingface Hub
+- Installs dependencies from `train_rag/requirements.txt`
+- Applies OCR (via Mistral API) to extract markdown from PDFs
+- Splits the markdown content into tokenized chunks using a Hugging Face tokenizer
+- Uploads the resulting RAG corpus to the Hugging Face Hub
+- Builds a **FAISS index** on the RAG corpus using the specified embedding model and stores it locally in a uniquely named folder (based on key RAG parameters)
+- Loads the base SFT model and applies a **LoRA adapter** using RAG-formatted MCQA data
+- Fine-tunes the model and stores it locally in a uniquely named folder (based on key RAG parameters)
+- Merging LoRA + base
+- Stores the merged model 
+- Stores the FAISS database locally in the same folder, enabling efficient evaluation
+- Evaluates the merged model on several MCQA benchmarks
 
-Recall that you have to submit your model weights, RAG documents, and training data via [Huggingface Hub](https://huggingface.co/). Make sure you
+The **LoRA model**, **merged LoRA + base model** and the **retriever FAISS index** are saved in a uniquely named output folder (under `./LoRA/`, `./LoRA/merged/` and `./FAISS/`) based on:
 
-- Have a Huggingface account.
-- Make all your submissions public on the Huggingface Hub.
+- base model name
+- RAG corpus name
+- embedding model
+- chunking parameters
+- similarity function used
 
-Please take a look at the documents on how to [upload your dataset](https://huggingface.co/docs/datasets/en/upload_dataset) (documents which are also a dataset) and [upload your model weights](https://huggingface.co/docs/transformers/en/model_sharing#pushtohubmixin). Note that you also have to **push the tokenizers to the same model repository**.
+This setup ensures full reproducibility and allows evaluating or reusing the model without recomputation.
 
-## Validating Your Submission
-**After you push your model weights and RAG documents to the correct Huggingface Hub repositories, make sure to test your models with the official [evaluation suite](https://github.com/eric11eca/lighteval-epfl-mnlp) in a fresh and clean environment (not the same environment you used for development).**
+Usage:  
+```bash
+./train_rag.sh
+```
 
-**If you got an error in the clean environment, you are responsible for debugging and correcting it.**
+### `train_dpo.sh`
+This script trains a causal language model using the Direct Preference Optimization (dpo) method. It performs the following steps: 
+
+- Load `/source_dataset/` from Hugging Face Hub.
+- Select only `\["prompt", "chosen", "rejected"]`\ columns.
+- Split the data into 90% train and 10% validation using seed.
+- Load a pretrained base model and tokenizer from Hugging Face.
+- Configure DPO training using DPOConfig.
+- Initialize the DPO trainer.
+- Check if there is any checkpoint saved in the output directory and starts from the latest one. Otherwise, trains from scratch.
+- Save final model and tokenizer to `\output_dir`\ named `\dpo_output`\.
+
+Usage: 
+```bash
+./train_dpo.sh
+```
