@@ -79,7 +79,7 @@ The script performs the following:
 
 Usage: 
 ```bash
-./train_sft.sh
+bash train_sft.sh
 ```
 
 ### `train_mcqa.sh`
@@ -95,7 +95,7 @@ The script performs the following steps:
 
 Usage: 
 ```bash
-./train_mcqa.sh
+bash train_mcqa.sh
 ```
 
 ### `train_quantized.sh`
@@ -145,7 +145,7 @@ This setup ensures full reproducibility and allows evaluating or reusing the mod
 
 Usage:  
 ```bash
-./train_rag.sh
+bash train_rag.sh
 ```
 
 ### `train_dpo.sh`
@@ -162,5 +162,5 @@ This script trains a causal language model using the Direct Preference Optimizat
 
 Usage: 
 ```bash
-./train_dpo.sh
+bash train_dpo.sh
 ```
