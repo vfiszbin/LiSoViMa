@@ -21,13 +21,13 @@ def prepare_and_push_dataset(
 ):
     
     API_KEY = ""
-    hf_token = ""
+    hf_token = "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"
 
-    api = HfApi(token=token)
+    api = HfApi(token=hf_token)
     dataset_exists = False 
     
     try:
-        api.dataset_info(repo_id)
+        api.dataset_info(dataset_name)
         dataset_exists=True
     except RepositoryNotFoundError:
         dataset_exists=False
@@ -48,6 +48,9 @@ def prepare_and_push_dataset(
         raw = raw.map(preprocess_for_argilla, remove_columns=raw_dataset.column_names)
         
         df = raw.to_pandas()
+        df["is_stem"] = ""
+
+        resulting_df = df.copy()
         
         for idx, row in df.iterrows():
             prompt = f"""A STEM-related question is a question in one of these fields : scientific inquiry, technological innovation, engineering design, and mathematical analysis.
@@ -95,7 +98,7 @@ def prepare_and_push_dataset(
 
     dataset = DatasetDict({
         "train": split["train"],
-        "val": split["val"]
+        "eval": split["test"]
     })
     
     print("✅ Dataset upload completed.")
@@ -201,7 +204,7 @@ def main():
         model=model,
         args=training_args,
         train_dataset=ds["train"],
-        eval_dataset=ds["val"],
+        eval_dataset=ds["eval"],
         processing_class=tokenizer,
     )
 
