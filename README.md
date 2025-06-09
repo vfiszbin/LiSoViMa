@@ -6,7 +6,7 @@ This repository contains the complete pipeline, codebase, and configuration file
 - **Retrieval-Augmented Generation (RAG) model**
 - **Direct Preference Optimization (DPO) model**
 
-We also include a pipeline for **Supervised Fine-Tuning (SFT)** on STEM data, which serves as a base for some of the above models.
+We also include a pipeline for Supervised Fine-Tuning (SFT) on STEM data, which serves as a base for some of the above models.
 
 ---
 
@@ -47,7 +47,7 @@ We also include a pipeline for **Supervised Fine-Tuning (SFT)** on STEM data, wh
 
 ---
 
-## 🔧 Training Scripts
+## Training Scripts
 
 Each model has its own training script that reproduces the fine-tuning process:
 
@@ -68,7 +68,7 @@ You should be able to reproduce the submission by running each script independen
 
 ### `train_sft.sh`
 
-This optional script trains a **base language model** on STEM-related multiple-choice QA data using a **Supervised Fine-Tuning (SFT)** approach. It is useful for pretraining a foundational model before applying more advanced techniques like MCQA, RAG or quantization.
+This optional script trains a base language model on STEM-related multiple-choice QA data using a Supervised Fine-Tuning (SFT) approach. It is useful for pretraining a foundational model before applying more advanced techniques like MCQA, RAG or quantization.
 
 The script performs the following:
  
@@ -117,7 +117,7 @@ bash train_quantized.sh
 
 ### `train_rag.sh`
 
-This script fine-tunes a **RAG-ready language model** on STEM-related multiple-choice QA data using **LoRA** and a **retrieval-augmented generation (RAG)** setup. It assumes a prior base model fine-tuned via SFT, and adds retrieval capabilities by aligning the model with an external corpus built from PDF textbooks.
+This script fine-tunes a RAG-ready language model on STEM-related multiple-choice QA data using LoRA and a retrieval-augmented generation (RAG) setup. It assumes a prior base model fine-tuned via SFT, and adds retrieval capabilities by aligning the model with an external corpus built from PDF textbooks.
 
 The script performs the following steps:
 
@@ -125,15 +125,15 @@ The script performs the following steps:
 - Applies OCR (via Mistral API) to extract markdown from PDFs
 - Splits the markdown content into tokenized chunks using a Hugging Face tokenizer
 - Uploads the resulting RAG corpus to the Hugging Face Hub
-- Builds a **FAISS index** on the RAG corpus using the specified embedding model and stores it locally in a uniquely named folder (based on key RAG parameters)
-- Loads the base SFT model and applies a **LoRA adapter** using RAG-formatted MCQA data
+- Builds a FAISS index on the RAG corpus using the specified embedding model and stores it locally in a uniquely named folder (based on key RAG parameters)
+- Loads the base SFT model and applies a LoRA adapter using RAG-formatted MCQA data
 - Fine-tunes the model and stores it locally in a uniquely named folder (based on key RAG parameters)
 - Merging LoRA + base
 - Stores the merged model 
 - Stores the FAISS database locally in the same folder, enabling efficient evaluation
 - Evaluates the merged model on several MCQA benchmarks
 
-The **LoRA model**, **merged LoRA + base model** and the **retriever FAISS index** are saved in a uniquely named output folder (under `./LoRA/`, `./LoRA/merged/` and `./FAISS/`) based on:
+The LoRA model, merged LoRA + base model and the retriever FAISS index are saved in a uniquely named output folder (under `./LoRA/`, `./LoRA/merged/` and `./FAISS/`) based on:
 
 - base model name
 - RAG corpus name
@@ -164,3 +164,8 @@ Usage:
 ```bash
 bash train_dpo.sh
 ```
+
+## Notes on Config Files
+
+The base model used in `model_configs/rag_model.yaml` is the same as the one in `model_configs/mcqa_model.yaml`, as it yielded the best results.  
+The embedding model specified in `model_configs/rag_model.yaml` is `thenlper/gte-small`.
