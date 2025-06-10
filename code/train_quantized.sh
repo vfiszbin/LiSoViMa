@@ -2,9 +2,7 @@
 HF_TOKEN="" # to set for dataset pushing and model pushing
 HF_USER="mkartofel" # to set for dataset pushing and model pushing
 MISTRAL_API_KEY="" # to set for dataset building
-
 pip install -r train_quantized/quantized_requirements.txt
-
 python train_quantized/train_quantized.py \
   --hf_user "$HF_USER" \
   --hf_token "$HF_TOKEN" \

@@ -64,7 +64,7 @@ These scripts will:
 - Train the model using your specified configuration
 - Save the final and best checkpoints locally
 
-You should be able to reproduce the submission by running each script independently.
+You should be able to reproduce the submission by running each script independently and all the required modules will be installed using 'pip' that should be installed beforehand.
 
 ### `train_sft.sh`
 
