@@ -21,7 +21,7 @@ def prepare_and_push_dataset(
 ):
     
     API_KEY = ""
-    hf_token = "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"
+    hf_token = ""
 
     api = HfApi(token=hf_token)
     dataset_exists = False 
