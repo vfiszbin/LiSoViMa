@@ -1,4 +1,6 @@
 #!/bin/bash
+pip install -r train_dpo/requirements.txt
+
 python train_dpo.py \
   --hf_user "thdsofia" \
   --dataset_name "thdsofia/MNLP_M3_dpo_dataset" \
