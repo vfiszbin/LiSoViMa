@@ -1,4 +1,4 @@
-# MNLP M3 — Final Project Submission
+# LiSoViMa - An Educational LLM Assistant
 
 This repository contains the complete implementation of our final project for the Modern Natural Language Processing course. The goal was to build and compare several lightweight LLM variants tailored for STEM multiple-choice question answering.
 
