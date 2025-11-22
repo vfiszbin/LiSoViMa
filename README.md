@@ -1,12 +1,19 @@
 # MNLP M3 — Final Project Submission
 
-This repository contains the complete pipeline, codebase, and configuration files to reproduce and evaluate four fine-tuned language models developed during the Modern Natural Language Processing course project (M3):  
+This repository contains the complete implementation of our final project for the Modern Natural Language Processing course. The goal was to build and compare several lightweight LLM variants tailored for STEM multiple-choice question answering.
+
+We built and evaluated four variants of Qwen3-0.6B for STEM multiple-choice question answering, each using a different technique: supervised fine-tuning, quantization, retrieval-augmented generation, and preference-based alignment.
+The repository provides the full training pipeline and configs for these models:
 - **MCQA model**
 - **Quantized model**
 - **Retrieval-Augmented Generation (RAG) model**
 - **Direct Preference Optimization (DPO) model**
 
 We also include a pipeline for Supervised Fine-Tuning (SFT) on STEM data, which serves as a base for some of the above models.
+
+**More details in the [final report](./pdf/LiSoViMa.pdf).**
+
+Authors: Matthias Wyss, Sofia Taouhid, Vincent Fiszbin, Lina Sadgal
 
 ---
 
